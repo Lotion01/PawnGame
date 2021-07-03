@@ -12,7 +12,6 @@
 using namespace std;
 
 int DEPTH_MAX = DEFAULT_DEPTH_MAX;
-bool cache = true;
 
 chrono::system_clock::time_point start;
 chrono::duration<double> sec;
@@ -26,12 +25,9 @@ Color turn = WHITE;
 
 Move bestMove;
 int lastMove = -1; // if en passant is available, cache the last move
-int gameMode = 3; // 0 : PvP, 1 : PvC with WHITE, 2 : PvC with BLACK, 3 : CvC
+int gameMode = 0; // 0 : PvP, 1 : PvC with WHITE, 2 : PvC with BLACK, 3 : CvC
 
-int _evalcount = 0;
-int _cache = 0;
-long long int _count = 0;
-int _maxDepth = 0;
+Debug debug = { 0, 0, 0, 0 };
 int timeflag = 0;
 
 double alltime;
@@ -95,7 +91,6 @@ int main(void) {
 			draw += 1;
 			flag = false;
 			continue;
-			//break;
 		}
 		else {
 			cout << "all legal moves : ";
@@ -116,9 +111,8 @@ int main(void) {
 				start = chrono::system_clock::now();
 				auto pos = findBestMove(0, pair<int, int>(POS_MIN, N));
 				sec = chrono::system_clock::now() - start;
-				cout << "best move is " << mstr(bestMove) << " (winning : " << pos.first
-					<< ", depth : " << pos.second << ", count : " << _count << ", maxDepth : " << _maxDepth << ", evalcount : " << _evalcount << ", cache : " << _cache << ")" << endl;
-				cout << "took " << sec.count() << " seconds " << endl;
+				cout << "best move is ";
+				printDebug(bestMove, pos, debug, sec);
 			}
 			else if (curMove == "finddepth") {
 				cout << "depth : ";
@@ -126,9 +120,8 @@ int main(void) {
 				start = chrono::system_clock::now();
 				auto pos = findBestMove(0, pair<int, int>(POS_MIN, N));
 				sec = chrono::system_clock::now() - start;
-				cout << "best move is " << mstr(bestMove) << " (winning : " << pos.first
-					<< ", depth : " << pos.second << ", count : " << _count << ", maxDepth : " << _maxDepth << ", evalcount : " << _evalcount << ", cache : " << _cache << ")" << endl;
-				cout << "took " << sec.count() << " seconds " << endl;
+				cout << "best move is ";
+				printDebug(bestMove, pos, debug, sec);
 			}
 			else if (curMove == "test") {
 				cout << "findLegalMove 1,000,000 test" << endl;
@@ -137,7 +130,7 @@ int main(void) {
 					legalMove = findLegalMove();
 				}
 				sec = chrono::system_clock::now() - start;
-				cout << "took " << sec.count() << " seconds " << endl;
+				printTime(sec);
 
 				cout << "evaluatePosition 10,000,000 test" << endl;
 				start = chrono::system_clock::now();
@@ -145,7 +138,7 @@ int main(void) {
 					int p = evaluatePosition(turn);
 				}
 				sec = chrono::system_clock::now() - start;
-				cout << "took " << sec.count() << " seconds " << endl;
+				printTime(sec);
 				
 				cout << "encodeBoard 10,000,000 test" << endl;
 				start = chrono::system_clock::now();
@@ -153,7 +146,7 @@ int main(void) {
 					long long int p = encodeBoard();
 				}
 				sec = chrono::system_clock::now() - start;
-				cout << "took " << sec.count() << " seconds " << endl;
+				printTime(sec);
 			}
 			else if (curMove == "eval") {
 				auto pos = evaluatePosition(turn);
@@ -184,9 +177,7 @@ int main(void) {
 				else cout << "Black played ";
 			}
 			else cout << "Your opponent played ";
-			cout << mstr(bestMove) << " (winning : " << pos.first
-				<< ", depth : " << pos.second << ", count : " << _count << ", maxDepth : " << _maxDepth << ", evalcount : " << _evalcount << ", cache : " << _cache << ")" << endl;
-			cout << "took " << sec.count() << " seconds" << endl;
+			printDebug(bestMove, pos, debug, sec);
 			alltime += sec.count();
 			if (turn == BLACK) turnCount++;
 			changeTurn();

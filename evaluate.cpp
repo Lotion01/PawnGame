@@ -2,7 +2,7 @@
 #include <cmath>
 
 extern Color board[8][8];
-extern int _evalcount;
+extern Debug debug;
 
 bool isWinner(Color turn) {
 	if (turn == WHITE) {
@@ -96,7 +96,7 @@ bool isFrozenPawn(int i, int j, Color turn) {
 }
 
 int evaluatePosition(Color turn) {
-	_evalcount++;
+	debug.evalCount++;
 	int p = 0;
 	constexpr int pawnScore = 4;
 	constexpr int passedPawnScore = 2;

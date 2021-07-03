@@ -8,8 +8,8 @@
 extern chrono::system_clock::time_point start;
 extern chrono::duration<double> sec;
 extern int DEPTH_MAX;
-extern int timeflag, _maxDepth, _evalcount, _cache;
-extern long long int _count;
+extern int timeflag;
+extern Debug debug;
 extern Color turn;
 extern int lastMove;
 extern Move bestMove;
@@ -44,8 +44,8 @@ pair<int, int> findBestMove(int n, pair<int, int> prevPos) {
 		timeflag++;
 		cout << "DEPTH_MAX LOWERED" << endl;
 	}
-	if (n >= _maxDepth) _maxDepth = n;
-	if (n == 0) _count = _evalcount = _cache = _maxDepth = timeflag = 0;
+	if (n >= debug.maxDepth) debug.maxDepth = n;
+	if (n == 0) debug.count = debug.evalCount = debug.cacheCount = debug.maxDepth = timeflag = 0;
 	if (isGameOver()) {
 		if (n % 2 == 0) return pair<int, int>(DEFEAT, n);
 		else return pair<int, int>(VICTORY, n);
@@ -54,7 +54,7 @@ pair<int, int> findBestMove(int n, pair<int, int> prevPos) {
 		if (n % 2 == 0) return pair<int, int>(evaluatePosition(turn), n);
 		else return pair<int, int>(-evaluatePosition(turn), n);
 	}
-	_count++;
+	debug.count++;
 	vector<Move> lm = findLegalMove();
 	if (lm.empty()) {
 		return pair<int, int>(0, n);

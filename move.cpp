@@ -5,8 +5,7 @@
 extern Color turn;
 extern int lastMove;
 extern Color board[8][8];
-extern bool cache;
-extern int _cache;
+extern Debug debug;
 extern int gameMode;
 extern unordered_map<long long int, vector<Move>> posTable;
 
@@ -74,15 +73,11 @@ void undoMove(Move move) {
 }
 
 vector<Move> findLegalMove() {
-	long long int code;
-
-	if (cache) {
-		code = encodeBoard();
-		auto it = posTable.find(code);
-		if (it != posTable.end()) {
-			_cache++;
-			return it->second;
-		}
+	long long int code = encodeBoard();
+	auto it = posTable.find(code);
+	if (it != posTable.end()) {
+		debug.cacheCount++;
+		return it->second;
 	}
 
 	vector<Move> table;
@@ -143,7 +138,7 @@ vector<Move> findLegalMove() {
 		}
 	}
 
-	if (cache && posTable.size() < CACHE_TABLE_SIZE) posTable[code] = table;
+	if (posTable.size() < CACHE_TABLE_SIZE) posTable[code] = table;
 	return table;
 }
 
